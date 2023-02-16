@@ -1,32 +1,31 @@
 resource "aws_vpc" "main" {
-  cidr_block       = "10.10.0.0/16"
-  instance_tenancy = "default"
+  cidr_block = var.cidr_block
 
+  instance_tenancy = "default"
   tags = {
-    Name = "terraform created"
+    Name = "${var.project_name}-VPC"
   }
 }
 
 resource "aws_subnet" "public_subnets" {
-  count             = length(var.public_subnet_cidrs)
+  for_each          = var.public_subnets
   vpc_id            = aws_vpc.main.id
-  cidr_block        = element(var.public_subnet_cidrs, count.index)
-  availability_zone = element(var.azs, count.index)
+  cidr_block        = each.value.cidr_block
+  availability_zone = each.value.availability_zone
 
   tags = {
-    Name = "Public Subnet ${count.index + 1}"
+    Name = "${var.project_name}-${each.key}"
   }
 }
 
 resource "aws_subnet" "private_subnets" {
-  count             = length(var.private_subnet_cidrs)
+  for_each          = var.private_subnets
   vpc_id            = aws_vpc.main.id
-  cidr_block        = element(var.private_subnet_cidrs, count.index)
-  availability_zone = element(var.azs, count.index)
-
+  cidr_block        = each.value.cidr_block
+  availability_zone = each.value.availability_zone
 
   tags = {
-    Name = "Private Subnet ${count.index + 1}"
+    Name = "${var.project_name}-${each.key}"
   }
 }
 
@@ -37,7 +36,14 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "main"
+    Name = "${var.project_name}-IG"
+  }
+}
+
+resource "aws_route_table" "private_rt" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "${var.project_name}-Private Route Table"
   }
 }
 
@@ -50,13 +56,18 @@ resource "aws_route_table" "public_rt" {
   }
 
   tags = {
-    Name = "public Route Table"
+    Name = "${var.project_name}-Public Route Table"
   }
 }
 
 resource "aws_route_table_association" "public_subnet_asso" {
-  count          = length(var.public_subnet_cidrs)
-  subnet_id      = element(aws_subnet.public_subnets[*].id, count.index)
+  for_each       = aws_subnet.public_subnets
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.public_rt.id
+}
 
+resource "aws_route_table_association" "private_subnet_asso" {
+  for_each       = aws_subnet.private_subnets
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.private_rt.id
 }

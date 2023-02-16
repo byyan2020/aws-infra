@@ -1,17 +1,36 @@
-variable "public_subnet_cidrs" {
-  type        = list(string)
-  description = "Public Subnet CIDR values"
-  default     = ["10.10.1.0/24", "10.10.2.0/24", "10.10.3.0/24"]
+variable "aws_profile" {
+  type        = string
+  description = "AWS profile"
 }
 
-variable "private_subnet_cidrs" {
-  type        = list(string)
-  description = "Private Subnet CIDR values"
-  default     = ["10.10.4.0/24", "10.10.5.0/24", "10.10.6.0/24"]
+variable "aws_region" {
+  type        = string
+  description = "Aws region to create VPC in"
 }
 
-variable "azs" {
-  type        = list(string)
-  description = "Availability Zones"
-  default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
+variable "project_name" {
+  description = "Name of the VPC"
+}
+
+variable "cidr_block" {
+  type        = string
+  description = "VPC CIDR block values"
+}
+
+variable "public_subnets" {
+  type = map(object({
+    cidr_block        = string
+    availability_zone = string
+  }))
+
+  description = "Public Subnet CIDR and AZ values"
+}
+
+variable "private_subnets" {
+  type = map(object({
+    cidr_block        = string
+    availability_zone = string
+  }))
+
+  description = "Private Subnet CIDR and AZ values"
 }
