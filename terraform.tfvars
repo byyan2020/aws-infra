@@ -2,7 +2,7 @@ aws_profile = "demo"
 
 aws_region = "us-west-2"
 
-project_name = "demo3"
+project_name = "demo"
 
 cidr_block = "100.10.0.0/16"
 
