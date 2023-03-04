@@ -1,4 +1,4 @@
-aws_profile = "demo"
+aws_profile = "dev"
 
 aws_region = "us-west-2"
 

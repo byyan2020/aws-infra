@@ -2,6 +2,10 @@ variable "instance_type" {
   default = "t2.micro"
 }
 
+variable "key_name" {
+  default = "aws-dev-us-west-2"
+}
+
 data "aws_ami" "webapp_ami" {
   filter {
     name   = "name"
@@ -11,6 +15,11 @@ data "aws_ami" "webapp_ami" {
   most_recent = true
 }
 
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "ec2_profile"
+  role = aws_iam_role.ec2_s3.name
+}
+
 resource "aws_instance" "webapp_instance" {
   ami                         = data.aws_ami.webapp_ami.id
   instance_type               = var.instance_type
@@ -18,6 +27,8 @@ resource "aws_instance" "webapp_instance" {
   associate_public_ip_address = true
 
   vpc_security_group_ids = [aws_security_group.webapp_sg.id]
+
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
 
   # Protect against accidental termination
   disable_api_termination = false
@@ -32,4 +43,18 @@ resource "aws_instance" "webapp_instance" {
   tags = {
     Name = "Web Application Instance"
   }
+
+  user_data = <<-EOF
+      #!/bin/bash
+      echo "DB_HOST=${aws_db_instance.postgresql.address}" >> /etc/environment
+      echo "DB_PORT=${aws_db_instance.postgresql.port}" >> /etc/environment
+      echo "DB_NAME=${aws_db_instance.postgresql.db_name}" >> /etc/environment
+      echo "DB_USER=${aws_db_instance.postgresql.username}" >> /etc/environment
+      echo "DB_PASSWORD=${aws_db_instance.postgresql.password}" >> /etc/environment
+      echo "BUCKET_NAME=${aws_s3_bucket.s3_webapp.bucket}" >> /etc/environment
+      sudo systemctl start csye6225webapp
+    EOF
+
+  key_name = var.key_name
+
 }
