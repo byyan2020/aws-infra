@@ -15,6 +15,7 @@ data "aws_ami" "webapp_ami" {
   most_recent = true
 }
 
+# Connect ec2 to S3
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2_profile"
   role = aws_iam_role.ec2_s3.name
@@ -56,5 +57,4 @@ resource "aws_instance" "webapp_instance" {
     EOF
 
   key_name = var.key_name
-
 }
