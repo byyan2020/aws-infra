@@ -18,7 +18,7 @@ data "aws_ami" "webapp_ami" {
 # Connect ec2 to S3
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2_profile"
-  role = aws_iam_role.ec2_s3.name
+  role = aws_iam_role.EC2Role.name
 }
 
 resource "aws_instance" "webapp_instance" {
@@ -53,6 +53,14 @@ resource "aws_instance" "webapp_instance" {
       echo "DB_USER=${aws_db_instance.postgresql.username}" >> /etc/environment
       echo "DB_PASSWORD=${aws_db_instance.postgresql.password}" >> /etc/environment
       echo "BUCKET_NAME=${aws_s3_bucket.s3_webapp.bucket}" >> /etc/environment
+      echo "LOG_PATH=/home/ec2-user/csye6225" >> /etc/environment
+
+      sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+        -a fetch-config \
+        -m ec2 \
+        -c file:/opt/cloudwatch-config.json \
+        -s
+
       sudo systemctl start csye6225webapp
     EOF
 
