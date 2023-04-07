@@ -18,12 +18,11 @@ resource "aws_autoscaling_group" "asg" {
     version = "$Latest"
   }
 
-  # target_group_arns = [
-  #   aws_lb_target_group.alb_tg.arn
-  # ]
+  target_group_arns = [
+    aws_lb_target_group.alb_tg.arn
+  ]
 
 }
-
 
 # scale up 
 resource "aws_autoscaling_policy" "scale-up-policy" {
@@ -42,7 +41,7 @@ resource "aws_cloudwatch_metric_alarm" "scale-up-cpu-alarm" {
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = "30"
+  period              = "60"
   statistic           = "Average"
   threshold           = "5"
   dimensions = {
@@ -69,9 +68,9 @@ resource "aws_cloudwatch_metric_alarm" "scale-down-cpu-alarm" {
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = "30"
+  period              = "60"
   statistic           = "Average"
-  threshold           = "5"
+  threshold           = "3"
   dimensions = {
     "AutoScalingGroupName" = "${aws_autoscaling_group.asg.name}"
   }
