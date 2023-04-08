@@ -8,6 +8,8 @@ cidr_block = "100.10.0.0/16"
 
 key_name = "aws-demo-us-west-2"
 
+route53_zone_name = "demo.yanbiyu.me"
+
 public_subnets = {
   public_subnets_1 = {
     cidr_block        = "100.10.1.0/24"
