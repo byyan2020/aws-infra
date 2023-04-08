@@ -6,7 +6,6 @@ resource "aws_autoscaling_group" "asg" {
   default_cooldown    = 60
   vpc_zone_identifier = [for s in aws_subnet.public_subnets : s.id]
 
-
   tag {
     key                 = "csye6225"
     value               = "webapp"
@@ -63,7 +62,7 @@ resource "aws_autoscaling_policy" "scale-down-policy" {
 
 resource "aws_cloudwatch_metric_alarm" "scale-down-cpu-alarm" {
   alarm_name          = "scale-down-cpu-alarm"
-  alarm_description   = "example-cpu-alarm-scaledown"
+  alarm_description   = "scale-down-cpu-alarm"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
