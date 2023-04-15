@@ -27,4 +27,6 @@ resource "aws_db_instance" "postgresql" {
   parameter_group_name   = aws_db_parameter_group.pg_webapp.name
   vpc_security_group_ids = [aws_security_group.database_sg.id]
   skip_final_snapshot    = true
+  storage_encrypted      = true
+  kms_key_id             = aws_kms_key.kms_rds.arn
 }
