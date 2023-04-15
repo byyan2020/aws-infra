@@ -57,4 +57,14 @@ resource "aws_launch_template" "csye6225_lt" {
   iam_instance_profile {
     name = "ec2_profile"
   }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      volume_size = 50
+      encrypted   = true
+      kms_key_id  = aws_kms_key.kms_ebs.arn
+    }
+  }
 }
